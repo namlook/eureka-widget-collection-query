@@ -1,0 +1,28 @@
+<div class="panel panel-default">
+    {{#if label}}
+        <div class="panel-heading">{{{label}}}</div>
+    {{/if}}
+
+    <div class="panel-body">
+
+        <ul class="list-unstyled">
+
+        {{#each filter in filters}}
+            <li>
+                <div class="form-inline">
+                    <div class="form-group">
+                        <button class="btn btn-danger btn-sm" {{action 'removeFilter' filter}}>&times;</button>
+                    </div>
+                    {{query-filter queryFilter=filter}}
+                    {{queryFilter.property}} {{queryFilter.value}}
+                </div>
+            </li>
+        {{/each}}
+
+        </ul>
+
+        <button class="btn btn-default" {{action 'addFilter'}}>+</button>
+        <button class="btn btn-primary" {{action 'updateCollection'}}>search</button>
+
+    </div>
+</div>

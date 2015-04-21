@@ -1,6 +1,19 @@
 # Eureka-widget-collection-query
 
-This README outlines the details of collaborating on this Ember addon.
+An UI that allow to make advanced queries on an Eureka collection. Usage:
+
+// /config/eureka/resource/collection.js
+
+    export default {
+        queryParams: ['query'], // useful if you want to update the url as well
+        widgets: [
+            {
+                type: 'collection-query',
+                queryParam: 'query' // needed if you want to use queryParams
+            }
+        ]
+    };
+
 
 ## Installation
 

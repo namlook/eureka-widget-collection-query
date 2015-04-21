@@ -1,0 +1,55 @@
+<div class="form-group" style="min-width: 192px">
+    {{select-2
+        classNames="form-control"
+        content=suggestedProperties
+        value=queryFilter.property
+        optionValuePath="content.id"
+        optionLabelPath="content.label"
+        placeholder="choose a property"}}
+</div>
+
+{{#if suggestedOperators.length}}
+    {{#unless isRelation}}
+        <div class="form-group">
+            {{view 'select'
+                classNames="form-control"
+                content=suggestedOperators
+                value=queryFilter.operator
+                optionValuePath="content.id"
+                optionLabelPath="content.label"
+                placeholder="operator"}}
+        </div>
+    {{/unless}}
+{{/if}}
+
+
+{{#if queryFilter.operator}}
+    <div class="form-group" style="min-width: 192px">
+        {{#if isText}}
+            {{input classNames="form-control" value=queryFilter.value}}
+        {{else if isNumber}}
+            {{input type="number" classNames="form-control" value=queryFilter.value}}
+        {{else if isBoolean}}
+            {{view 'select'
+                classNames="form-control"
+                content=suggestedBooleans
+                value=queryFilter.value
+                optionValuePath="content.id"
+                optionLabelPath="content.label"}}
+        {{else if isDate}}
+            {{input type="date" classNames="form-control" value=queryFilter.value}}
+        {{else if isDateTime}}
+            {{input type="datetime-local" classNames="form-control" value=queryFilter.value}}
+        {{else if isRelation}}
+            {{select-2
+                classNames="form-control"
+                url=relationSuggestUrl
+                content=relationDefaultValue
+                dataFn=relationSelect2QueryParametersFn
+                processResultsFn=relationSelect2ProcessResultsFn
+                optionValuePath="content.id"
+                optionLabelPath="content.label"
+                value=queryFilter.value}}
+        {{/if}}
+    </div>
+{{/if}}

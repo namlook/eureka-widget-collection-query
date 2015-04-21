@@ -1,7 +1,7 @@
 {
   "name": "eureka-widget-collection-query",
   "version": "0.0.0",
-  "description": "The default blueprint for ember-cli addons.",
+  "description": "An UI to perform advanced queries on an Eureka collection.",
   "directories": {
     "doc": "doc",
     "test": "tests"
@@ -13,7 +13,7 @@
   },
   "repository": "",
   "engines": {
-    "node": ">= 0.10.0"
+    "node": ">= 0.12.0"
   },
   "author": "",
   "license": "MIT",
@@ -33,10 +33,12 @@
     "ember-disable-prototype-extensions": "^1.0.0"
   },
   "keywords": [
-    "ember-addon"
+    "ember-addon",
+    "eureka-widget"
   ],
   "dependencies": {
-    "ember-cli-babel": "^4.0.0"
+    "ember-cli-babel": "^4.0.0",
+    "ember-cli-htmlbars": "^0.7.4"
   },
   "ember-addon": {
     "configPath": "tests/dummy/config"
