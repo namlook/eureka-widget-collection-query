@@ -11,10 +11,9 @@
             <li>
                 <div class="form-inline">
                     <div class="form-group">
-                        <button class="btn btn-danger btn-sm" {{action 'removeFilter' filter}}>&times;</button>
+                        <button class="btn btn-default btn-sm" style="color:red;border:0;font-weight:bolder;font-size:18px" {{action 'removeFilter' filter}}>&times;</button>
                     </div>
-                    {{query-filter queryFilter=filter}}
-                    {{queryFilter.property}} {{queryFilter.value}}
+                    {{query-filter queryFilter=filter modelMeta=routeModel.meta}}
                 </div>
             </li>
         {{/each}}
@@ -23,6 +22,5 @@
 
         <button class="btn btn-default" {{action 'addFilter'}}>+</button>
         <button class="btn btn-primary" {{action 'updateCollection'}}>search</button>
-
     </div>
 </div>

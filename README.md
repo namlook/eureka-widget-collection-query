@@ -1,6 +1,6 @@
 # Eureka-widget-collection-query
 
-An UI that allow to make advanced queries on an Eureka collection. Usage:
+An UI to perform advanced queries on an Eureka collection. Usage:
 
 // /config/eureka/resource/collection.js
 

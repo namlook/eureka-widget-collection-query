@@ -1,6 +1,6 @@
 import Ember from 'ember';
 import layout from '../templates/components/query-filter';
-
+import {getFieldMeta} from 'ember-eureka/components/property-autosuggest';
 
 var operatorChoices = {
     text: [
@@ -50,17 +50,22 @@ export default Ember.Component.extend({
     isDateTime: Ember.computed.alias('propertyMeta.isDateTime'),
     isRelation: Ember.computed.alias('propertyMeta.isRelation'),
 
-    /*** relation related stuff ***/
-    relationSuggestUrl: function() {
-        return this.get('propertyMeta.relationModelMeta.store.resourceEndpoint');
-    }.property('propertyMeta.type', 'propertyMeta.relationModelMeta.store.resourceEndpoint'),
 
-    relationDefaultValue: function() {
+    /*** relation related stuff ***/
+    relationSuggestUrl: Ember.computed(
+        'propertyMeta.type',
+        'propertyMeta.relationModelMeta.store.resourceEndpoint',
+        function() {
+            return this.get('propertyMeta.relationModelMeta.store.resourceEndpoint');
+    }),
+
+
+    relationDefaultValue: Ember.computed('queryFilter.value', function() {
         var defaultValue = this.get('queryFilter.value');
         return Ember.A([
             {id: defaultValue, label: defaultValue}
         ]);
-    }.property('queryFilter.value'),
+    }),
 
 
     relationSelect2QueryParametersFn: function(params) {
@@ -83,14 +88,14 @@ export default Ember.Component.extend({
     /** if the queryFilter.property is changing, we have to
      * reset the operator and its value
      */
-    _onPropertyChanged: function() {
+    _onPropertyChanged: Ember.observer('queryFilter.property', function() {
         this.set('queryFilter.operator', null);
         this.set('queryFilter.value', null);
-    }.observes('queryFilter.property'),
+    }),
 
 
     /** return the properties of the resources **/
-    suggestedProperties: function() {
+    suggestedProperties: Ember.computed('queryFilter.modelMeta.fieldNames.[]', function() {
         var modelMeta = this.get('queryFilter.modelMeta');
         var propertyNames = modelMeta.get('fieldNames');
         var content = propertyNames.map(function(name) {
@@ -100,17 +105,19 @@ export default Ember.Component.extend({
             };
         });
         return content;
-    }.property('queryFilter.modelMeta.fieldNames'),
+    }),
 
     /** return the selected property meta informations **/
-    propertyMeta: function() {
+    propertyMeta: Ember.computed('queryFilter.property', 'queryFilter.modelMeta', function() {
         var property = this.get('queryFilter.property');
-        return this.get('queryFilter.modelMeta.'+property+'Field');
-    }.property('queryFilter.property'),
+        if (property) {
+            return getFieldMeta(property.split('.'), this.get('queryFilter.modelMeta'));
+        }
+    }),
 
 
     /** return a suggestion of operator for the selected property **/
-    suggestedOperators: function() {
+    suggestedOperators: Ember.computed('queryFilter.operator', 'propertyMeta', function() {
         var propertyMeta = this.get('propertyMeta');
         var operators = Ember.A([]);
 
@@ -142,14 +149,14 @@ export default Ember.Component.extend({
         }
 
         return operators;
-    }.property('query.property', 'propertyMeta'),
+    }),
 
 
     /** used to display the correct values when a property has a boolean type **/
-    suggestedBooleans: function() {
+    suggestedBooleans: Ember.computed(function() {
         return [
             {id: 'true', label: 'true'},
             {id: 'false', label: 'false'}
         ];
-    }.property()
+    })
 });

@@ -1,12 +1,4 @@
-<div class="form-group" style="min-width: 192px">
-    {{select-2
-        classNames="form-control"
-        content=suggestedProperties
-        value=queryFilter.property
-        optionValuePath="content.id"
-        optionLabelPath="content.label"
-        placeholder="choose a property"}}
-</div>
+{{property-autosuggest modelMeta=modelMeta value=queryFilter.property}}
 
 {{#if suggestedOperators.length}}
     {{#unless isRelation}}
