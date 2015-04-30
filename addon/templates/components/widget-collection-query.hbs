@@ -11,7 +11,11 @@
             <li>
                 <div class="form-inline">
                     <div class="form-group">
-                        <button class="btn btn-default btn-sm" style="color:red;border:0;font-weight:bolder;font-size:18px" {{action 'removeFilter' filter}}>&times;</button>
+                        <button class="btn btn-default btn-sm"
+                            style="color:red;border:0;font-weight:bolder;font-size:18px"
+                            {{action 'removeFilter' filter}}>
+                            &times;
+                        </button>
                     </div>
                     {{query-filter queryFilter=filter modelMeta=routeModel.meta}}
                 </div>

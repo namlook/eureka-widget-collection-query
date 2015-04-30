@@ -17,17 +17,17 @@
 
 {{#if queryFilter.operator}}
     <div class="form-group" style="min-width: 192px">
-        {{#if isText}}
-            {{input classNames="form-control" value=queryFilter.value}}
-        {{else if isNumber}}
-            {{input type="number" classNames="form-control" value=queryFilter.value}}
-        {{else if isBoolean}}
+        {{#if isBoolean}}
             {{view 'select'
                 classNames="form-control"
                 content=suggestedBooleans
                 value=queryFilter.value
                 optionValuePath="content.id"
                 optionLabelPath="content.label"}}
+        {{else if isText}}
+            {{input classNames="form-control" value=queryFilter.value}}
+        {{else if isNumber}}
+            {{input type="number" classNames="form-control" value=queryFilter.value}}
         {{else if isDate}}
             {{input type="date" classNames="form-control" value=queryFilter.value}}
         {{else if isDateTime}}

@@ -4,33 +4,32 @@ import {getFieldMeta} from 'ember-eureka/components/property-autosuggest';
 
 var operatorChoices = {
     text: [
+        {id: 'iregex', label: 'contains'},
         {id: 'equal', label: 'equal'},
         {id: 'ne', label: 'not equal'},
-        {id: 'regex', label: 'regex'},
-        {id: 'iregex', label: 'iregex'},
-        {id: 'exists', label: 'exists'},
+        {id: 'exists', label: 'filled'},
     ],
     number: [
         {id: 'equal', label: 'equal'},
-        {id: 'ne', label: 'not equal'},
         {id: 'gt', label: 'greater than'},
-        {id: 'gte', label: 'greater or equal than'},
         {id: 'lt', label: 'lower than'},
-        {id: 'lte', label: 'lower or equal than'},
-        {id: 'exists', label: 'exists'},
+        {id: 'ne', label: 'not equal'},
+        {id: 'gte', label: 'greater or equal'},
+        {id: 'lte', label: 'lower or equal'},
+        {id: 'exists', label: 'filled'},
     ],
     date: [
         {id: 'equal', label: 'equal'},
-        {id: 'ne', label: 'not equal'},
-        {id: 'lt', label: 'before'},
-        {id: 'lte', label: 'before or equal'},
-        {id: 'gt', label: 'after'},
-        {id: 'gte', label: 'after or equal'},
-        {id: 'exists', label: 'exists'},
+        // {id: 'lt', label: 'before'},
+        // {id: 'gt', label: 'after'},
+        // {id: 'ne', label: 'not equal'},
+        // {id: 'lte', label: 'before or equal'},
+        // {id: 'gte', label: 'after or equal'},
+        {id: 'exists', label: 'filled'},
     ],
     boolean: [
         {id: 'equal', label: 'equal'},
-        {id: 'exists', label: 'exists'},
+        {id: 'exists', label: 'filled'},
     ],
     relation: [
         {id: 'equal', label: 'equal'}
@@ -45,7 +44,12 @@ export default Ember.Component.extend({
 
     isText: Ember.computed.alias('propertyMeta.isText'),
     isNumber: Ember.computed.alias('propertyMeta.isNumber'),
-    isBoolean: Ember.computed.alias('propertyMeta.isBoolean'),
+    isBoolean: Ember.computed('propertyMeta.isBoolean', 'queryFilter.operator', function() {
+        if (this.get('queryFilter.operator') === 'exists') {
+            return true;
+        }
+        return this.get('propertyMeta.isBoolean');
+    }),
     isDate: Ember.computed.alias('propertyMeta.isDate'),
     isDateTime: Ember.computed.alias('propertyMeta.isDateTime'),
     isRelation: Ember.computed.alias('propertyMeta.isRelation'),
@@ -109,43 +113,32 @@ export default Ember.Component.extend({
 
     /** return the selected property meta informations **/
     propertyMeta: Ember.computed('queryFilter.property', 'queryFilter.modelMeta', function() {
+        var modelMeta = this.get('queryFilter.modelMeta');
         var property = this.get('queryFilter.property');
-        if (property) {
-            return getFieldMeta(property.split('.'), this.get('queryFilter.modelMeta'));
-        }
+        return modelMeta.getFieldMeta(property);
     }),
 
 
     /** return a suggestion of operator for the selected property **/
-    suggestedOperators: Ember.computed('queryFilter.operator', 'propertyMeta', function() {
-        var propertyMeta = this.get('propertyMeta');
+    suggestedOperators: Ember.computed('queryFilter.operator', 'propertyMeta.typeCategory', function() {
+        var typeCategory = this.get('propertyMeta.typeCategory');
         var operators = Ember.A([]);
 
-        if (propertyMeta) {
-            operators.pushObject({id: null, label: `--- ${propertyMeta.get('type')} ---`});
-            if (this.get('isText')) {
-                operators.pushObjects(operatorChoices.text);
-            } else if (this.get('isNumber')) {
-                operators.pushObjects(operatorChoices.number);
-            } else if (this.get('isBoolean')) {
-                operators.pushObjects(operatorChoices.boolean);
-                this.set('queryFilter.operator', 'equal');
-            } else if (this.get('isDate')) {
-                operators.pushObjects(operatorChoices.date);
-            } else if (this.get('isDateTime')) {
-                operators.pushObjects(operatorChoices.date);
-            } else if (this.get('isRelation')) {
-                operators.pushObjects(operatorChoices.relation);
-                this.set('queryFilter.operator', 'equal');
-            }
+        if (typeCategory) {
+            operators.pushObjects(operatorChoices[typeCategory]);
         }
 
 
         /** if the filter's operator is not in the suggested operators,
-         * it means that the property may have changed.
+         * it means that the property may have changed. Then, we fill
+         * the operator with the first suggestion
          */
         if (!operators.findBy('id', this.get('queryFilter.operator'))) {
-            this.set('queryFilter.operator', null);
+            var operator = null;
+            if (typeCategory) {
+                operator = operatorChoices[typeCategory][0].id;
+            }
+            this.set('queryFilter.operator', operator);
         }
 
         return operators;

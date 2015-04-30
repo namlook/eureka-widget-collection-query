@@ -1,13 +1,14 @@
 
 import Ember from 'ember';
 import WidgetCollection from 'ember-eureka/widget-collection';
-import QueryParametrableWidgetMixin from 'eureka-mixin-query-parametrable-widget';
-
+// import QueryParametrableWidgetMixin from 'eureka-mixin-query-parametrable-widget';
 import layout from '../templates/components/widget-collection-query';
 
 
 export default WidgetCollection.extend(/*QueryParametrableWidgetMixin,*/ {
     layout: layout,
+
+    label: Ember.computed.alias('config.label'),
 
     /** Make the filterTerm a queryParam if configured in `config` */
     initQuery: function() {
