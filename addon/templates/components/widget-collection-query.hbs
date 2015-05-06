@@ -1,4 +1,4 @@
-<div class="panel panel-default">
+<div class="panel panel-default widget-collection-query">
     {{#if label}}
         <div class="panel-heading">{{{label}}}</div>
     {{/if}}
@@ -24,7 +24,26 @@
 
         </ul>
 
-        <button class="btn btn-default" {{action 'addFilter'}}>+</button>
-        <button class="btn btn-primary" {{action 'updateCollection'}}>search</button>
+        <div class="form-inline">
+            <div class="form-group">
+                <button class="btn btn-default" {{action 'addFilter'}}>
+                    <i class="glyphicon glyphicon-plus"></i>
+                </button>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-primary" {{action 'updateCollection'}}>
+                        <i class="glyphicon glyphicon-search"></i> search
+                    </button>
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        <span class="caret"></span>
+                        <span class="sr-only">Toggle Dropdown</span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="#" {{action 'exportData' 'csv'}}>export as CSV</a></li>
+                        <li><a href="#" {{action 'exportData' 'json'}}>export as JSON</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

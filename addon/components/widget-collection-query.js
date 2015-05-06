@@ -10,13 +10,19 @@ export default WidgetCollection.extend(/*QueryParametrableWidgetMixin,*/ {
 
     label: Ember.computed.alias('config.label'),
 
+
     /** Make the filterTerm a queryParam if configured in `config` */
-    initQuery: function() {
+    initQuery: Ember.on('init', function() {
         var filters = Ember.A();
         var routeModel = this.get('routeModel');
 
         var property, operator, value;
+        var _that = this;
         routeModel.get('query').forEach(function(filter) {
+            if (filter.field[0] === '_') {
+                return; // ignore config params
+            }
+
             property = filter.field.split('[')[0];
             operator = filter.field.split('[')[1];
             if (operator) {
@@ -34,7 +40,7 @@ export default WidgetCollection.extend(/*QueryParametrableWidgetMixin,*/ {
         });
 
         this.set('filters', filters);
-    }.on('init'),
+    }),
 
 
     /** update the `routeModel.query` */
@@ -43,6 +49,9 @@ export default WidgetCollection.extend(/*QueryParametrableWidgetMixin,*/ {
 
         var rawQuery = {};
         query.forEach(function(filter) {
+            if (!filter.property)  {
+                return;
+            }
             if (filter.operator === 'equal') {
                 rawQuery[filter.property] = filter.value;
             } else {
@@ -52,7 +61,6 @@ export default WidgetCollection.extend(/*QueryParametrableWidgetMixin,*/ {
 
         this.set('routeModel.query.raw', rawQuery);
     },
-
 
 
     /** update the query when the user hit the enter key */
@@ -80,6 +88,15 @@ export default WidgetCollection.extend(/*QueryParametrableWidgetMixin,*/ {
         clear: function() {
             this.set('filters', Ember.A());
             this.updateQuery();
+        },
+        exportData: function(format) {
+            this.updateQuery();
+            var urlQuery = this.get('routeModel.query.content').map((item) => {
+                return `${item.get('field')}=${item.get('value')}`;
+            }).join('&');
+            var apiEndpoint = this.get('routeModel.meta.store.resourceEndpoint');
+            var url = `${apiEndpoint}/export/${format}?${urlQuery}`;
+            window.open(url);
         }
     }
 
