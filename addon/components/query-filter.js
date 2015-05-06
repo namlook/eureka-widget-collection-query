@@ -97,20 +97,6 @@ export default Ember.Component.extend({
         this.set('queryFilter.value', null);
     }),
 
-
-    /** return the properties of the resources **/
-    suggestedProperties: Ember.computed('queryFilter.modelMeta.fieldNames.[]', function() {
-        var modelMeta = this.get('queryFilter.modelMeta');
-        var propertyNames = modelMeta.get('fieldNames');
-        var content = propertyNames.map(function(name) {
-            return {
-                id: name,
-                label: modelMeta.get(name+'Field.label'),
-            };
-        });
-        return content;
-    }),
-
     /** return the selected property meta informations **/
     propertyMeta: Ember.computed('queryFilter.property', 'queryFilter.modelMeta', function() {
         var modelMeta = this.get('queryFilter.modelMeta');
