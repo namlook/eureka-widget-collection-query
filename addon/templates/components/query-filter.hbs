@@ -3,13 +3,15 @@
 {{#if suggestedOperators.length}}
     {{#unless isRelation}}
         <div class="form-group">
-            {{view 'select'
-                classNames="form-control"
-                content=suggestedOperators
+
+            {{#x-select
                 value=queryFilter.operator
-                optionValuePath="content.id"
-                optionLabelPath="content.label"
-                placeholder="operator"}}
+                classNameBindings=":form-control"}}
+                    {{#each suggestedOperators as |op|}}
+                        {{#x-option value=op.id}} {{op.label}} {{/x-option}}
+                    {{/each}}
+            {{/x-select}}
+
         </div>
     {{/unless}}
 {{/if}}
@@ -18,23 +20,24 @@
 {{#if queryFilter.operator}}
     <div class="form-group" style="min-width: 192px">
         {{#if isBoolean}}
-            {{view 'select'
-                classNames="form-control"
-                content=suggestedBooleans
-                value=queryFilter.value
-                optionValuePath="content.id"
-                optionLabelPath="content.label"}}
+
+            {{#x-select value=queryFilter.value classNameBindings=":form-control"}}
+                {{#each suggestedBooleans as |bool|}}
+                    {{#x-option value=bool.id}} {{bool.label}} {{/x-option}}
+                {{/each}}
+            {{/x-select}}
+
         {{else if isText}}
-            {{input classNames="form-control" value=queryFilter.value}}
+            {{input classNameBindings=":form-control" value=queryFilter.value}}
         {{else if isNumber}}
-            {{input type="number" classNames="form-control" value=queryFilter.value}}
+            {{input type="number" classNameBindings=":form-control" value=queryFilter.value}}
         {{else if isDate}}
-            {{input type="date" classNames="form-control" value=queryFilter.value}}
+            {{input type="date" classNameBindings=":form-control" value=queryFilter.value}}
         {{else if isDateTime}}
-            {{input type="datetime-local" classNames="form-control" value=queryFilter.value}}
+            {{input type="datetime-local" classNameBindings=":form-control" value=queryFilter.value}}
         {{else if isRelation}}
             {{select-2
-                classNames="form-control"
+                classNameBindings=":form-control"
                 url=relationSuggestUrl
                 content=relationDefaultValue
                 dataFn=relationSelect2QueryParametersFn
