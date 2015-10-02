@@ -1,6 +1,6 @@
 {
   "name": "eureka-widget-collection-query",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "An UI to perform advanced queries on an Eureka collection.",
   "directories": {
     "doc": "doc",
