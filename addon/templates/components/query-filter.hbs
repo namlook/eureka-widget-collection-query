@@ -3,22 +3,18 @@
 {{#if suggestedOperators.length}}
     {{#unless isRelation}}
         <div class="form-group">
-
-            {{#x-select
-                value=queryFilter.operator
-                classNameBindings=":form-control"}}
-                    {{#each suggestedOperators as |op|}}
-                        {{#x-option value=op.id}} {{op.label}} {{/x-option}}
-                    {{/each}}
-            {{/x-select}}
-
+            {{#ek-selectize value=queryFilter.operator}}
+                {{#each suggestedOperators as |op|}}
+                    <option value="{{op.id}}"> {{op.label}} </option>
+                {{/each}}
+            {{/ek-selectize}}
         </div>
     {{/unless}}
 {{/if}}
 
 
 {{#if queryFilter.operator}}
-    <div class="form-group" style="min-width: 192px">
+    <div class="form-group">
         {{#if isBoolean}}
 
             {{#x-select value=queryFilter.value classNameBindings=":form-control"}}
@@ -36,15 +32,13 @@
         {{else if isDateTime}}
             {{input type="datetime-local" classNameBindings=":form-control" value=queryFilter.value}}
         {{else if isRelation}}
-            {{select-2
-                classNameBindings=":form-control"
-                url=relationSuggestUrl
-                content=relationDefaultValue
-                dataFn=relationSelect2QueryParametersFn
-                processResultsFn=relationSelect2ProcessResultsFn
+            {{ek-selectize
+                content=suggestedRelations
+                value=queryFilter.value
+                onSearch="relationSearchFilter"
                 optionValuePath="content.id"
                 optionLabelPath="content.label"
-                value=queryFilter.value}}
+                loading=isRelationSuggestionsLoading}}
         {{/if}}
     </div>
 {{/if}}

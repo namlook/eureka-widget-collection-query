@@ -1,6 +1,6 @@
 import Ember from 'ember';
 import layout from '../templates/components/query-filter';
-import {getFieldMeta} from 'ember-eureka/components/property-autosuggest';
+// import {getFieldMeta} from 'ember-eureka/components/property-autosuggest';
 
 var operatorChoices = {
     text: [
@@ -41,6 +41,8 @@ export default Ember.Component.extend({
     tagName: 'span',
     layout: layout,
     queryFilter: null,
+    isRelationSuggestionsLoading: false,
+
 
     isText: Ember.computed.alias('propertyMeta.isText'),
     isNumber: Ember.computed.alias('propertyMeta.isNumber'),
@@ -53,40 +55,6 @@ export default Ember.Component.extend({
     isDate: Ember.computed.alias('propertyMeta.isDate'),
     isDateTime: Ember.computed.alias('propertyMeta.isDateTime'),
     isRelation: Ember.computed.alias('propertyMeta.isRelation'),
-
-
-    /*** relation related stuff ***/
-    relationSuggestUrl: Ember.computed(
-        'propertyMeta.type',
-        'propertyMeta.relationModelMeta.store.resourceEndpoint',
-        function() {
-            return this.get('propertyMeta.relationModelMeta.store.resourceEndpoint');
-    }),
-
-
-    relationDefaultValue: Ember.computed('queryFilter.value', function() {
-        var defaultValue = this.get('queryFilter.value');
-        return Ember.A([
-            {id: defaultValue, label: defaultValue}
-        ]);
-    }),
-
-
-    relationSelect2QueryParametersFn: function(params) {
-        var queryParameters = {};
-        if (params.term) {
-            queryParameters["title[$iregex]"] = '^'+params.term;
-        }
-        return queryParameters;
-    },
-
-
-    relationSelect2ProcessResultsFn: function(data) {
-        var results = data.results.map(function(item) {
-            return {id: item._id, text: item.title};
-        });
-        return {results: results};
-    },
 
 
     /** if the queryFilter.property is changing, we have to
@@ -103,6 +71,32 @@ export default Ember.Component.extend({
         var property = this.get('queryFilter.property');
         return modelMeta.getFieldMeta(property);
     }),
+
+
+    loadSuggestedRelation: Ember.on('init', Ember.observer(
+      'relationSearchTerm',
+      'propertyMeta.relationModelMeta.store',
+      function() {
+        let relationSearchTerm = this.get('relationSearchTerm');
+        let store = this.get('propertyMeta.relationModelMeta.store');
+        if (store) {
+            this.set('isRelationSuggestionsLoading', true);
+            store.find({title: {$iregex: relationSearchTerm}}).then((data) => {
+                let results = data.map((item) => {
+                    return {id: item.content._id, label: item.content.title};
+                });
+                this.set('isRelationSuggestionsLoading', false);
+                this.set('suggestedRelations', results);
+            });
+        }
+    })),
+
+
+    actions: {
+        relationSearchFilter(relationSearchTerm) {
+            this.set('relationSearchTerm', relationSearchTerm);
+        }
+    },
 
 
     /** return a suggestion of operator for the selected property **/
