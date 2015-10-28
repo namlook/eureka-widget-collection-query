@@ -17,20 +17,22 @@ export default WidgetCollection.extend(/*QueryParametrableWidgetMixin,*/ {
         var routeModel = this.get('routeModel');
 
         var property, operator, value;
-        var _that = this;
         routeModel.get('query').forEach(function(filter) {
             if (filter.field[0] === '_') {
                 return; // ignore config params
             }
 
-            property = filter.field.split('[')[0];
-            operator = filter.field.split('[')[1];
-            if (operator) {
-                operator = operator.split(']')[0].replace('$', '');
+            property = filter.field;
+
+            if (typeof filter.value === 'object') {
+                operator = Object.keys(filter.value)[0];
+                value = filter.value[operator];
+                operator = operator.replace('$', '');
             } else {
                 operator = 'equal';
+                value = filter.value;
             }
-            value = filter.value;
+
             filters.pushObject({
                 property: property,
                 modelMeta: routeModel.get('meta'),
@@ -48,17 +50,19 @@ export default WidgetCollection.extend(/*QueryParametrableWidgetMixin,*/ {
         var query = this.get('filters');
 
         var rawQuery = {};
-        query.forEach(function(filter) {
+        for (let filter of query) {
             if (!filter.property)  {
                 return;
             }
             if (filter.operator === 'equal') {
                 rawQuery[filter.property] = filter.value;
             } else {
-                rawQuery[filter.property+'[$'+filter.operator+']'] = filter.value;
+                if (!rawQuery[filter.property]) {
+                    rawQuery[filter.property] = {};
+                }
+                rawQuery[filter.property]['$'+filter.operator] = filter.value;
             }
-        });
-
+        }
         this.set('routeModel.query.raw', rawQuery);
     },
 
@@ -89,15 +93,16 @@ export default WidgetCollection.extend(/*QueryParametrableWidgetMixin,*/ {
             this.set('filters', Ember.A());
             this.updateQuery();
         },
-        exportData: function(format) {
-            this.updateQuery();
-            var urlQuery = this.get('routeModel.query.content').map((item) => {
-                return `${item.get('field')}=${item.get('value')}`;
-            }).join('&');
-            var apiEndpoint = this.get('routeModel.meta.store.resourceEndpoint');
-            var url = `${apiEndpoint}/export/${format}?${urlQuery}`;
-            window.open(url);
-        }
+        // exportData: function(format) {
+        //     this.updateQuery();
+        //     var urlQuery = this.get('routeModel.query.content').map((item) => {
+        //         return `filter[${item.get('field')}]=${item.get('value')}`;
+        //     }).join('&');
+        //     var apiEndpoint = this.get('routeModel.meta.store.resourceEndpoint');
+        //     console.log('>>>', apiEndpoint, urlQuery);
+        //     var url = `${apiEndpoint}/i/stream/${format}?${urlQuery}`;
+        //     window.open(url);
+        // }
     }
 
 });

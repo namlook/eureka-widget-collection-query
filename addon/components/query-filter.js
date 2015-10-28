@@ -20,11 +20,11 @@ var operatorChoices = {
     ],
     date: [
         {id: 'equal', label: 'equal'},
-        // {id: 'lt', label: 'before'},
-        // {id: 'gt', label: 'after'},
-        // {id: 'ne', label: 'not equal'},
-        // {id: 'lte', label: 'before or equal'},
-        // {id: 'gte', label: 'after or equal'},
+        {id: 'lt', label: 'before'},
+        {id: 'gt', label: 'after'},
+        {id: 'ne', label: 'not equal'},
+        {id: 'lte', label: 'before or equal'},
+        {id: 'gte', label: 'after or equal'},
         {id: 'exists', label: 'filled'},
     ],
     boolean: [
@@ -42,6 +42,7 @@ export default Ember.Component.extend({
     layout: layout,
     queryFilter: null,
     isRelationSuggestionsLoading: false,
+    store: Ember.computed.alias('propertyMeta.relationModelMeta.store'),
 
 
     isText: Ember.computed.alias('propertyMeta.isText'),
@@ -73,23 +74,48 @@ export default Ember.Component.extend({
     }),
 
 
-    loadSuggestedRelation: Ember.on('init', Ember.observer(
-      'relationSearchTerm',
-      'propertyMeta.relationModelMeta.store',
-      function() {
-        let relationSearchTerm = this.get('relationSearchTerm');
-        let store = this.get('propertyMeta.relationModelMeta.store');
-        if (store) {
+    _loadSuggestedRelation() {
+        let store = this.get('store');
+        let searchTerm = this.get('relationSearchTerm');
+        let oldSearchTerm = this.get('oldSearchTerm');
+        if (store && (searchTerm && searchTerm !== oldSearchTerm || !searchTerm)) {
             this.set('isRelationSuggestionsLoading', true);
-            store.find({title: {$iregex: relationSearchTerm}}).then((data) => {
+            this.set('oldSearchTerm', searchTerm);
+            let query = {};
+            if (searchTerm) {
+                query = {filter: {title: {$iregex: searchTerm}}};
+            }
+            store.find(query).then((data) => {
                 let results = data.map((item) => {
-                    return {id: item.content._id, label: item.content.title};
+                    return {id: item.get('_id'), label: item.get('title')};
                 });
                 this.set('isRelationSuggestionsLoading', false);
                 this.set('suggestedRelations', results);
             });
         }
+    },
+
+
+    onInit: Ember.on('init', Ember.observer('store', function() {
+        let store = this.get('store');
+        let relId = this.get('queryFilter.value');
+        if (relId && store) {
+            store.fetch(relId).then((relation) => {
+                let results = [{
+                    id: relation.get('_id'),
+                    label: relation.get('title')
+                }];
+                this.set('suggestedRelations', results);
+            });
+        }
+
     })),
+
+    loadSuggestedRelation: Ember.observer('relationSearchTerm', 'store', function() {
+        Ember.run.debounce(this, function() {
+            this._loadSuggestedRelation();
+        }, 0);
+    }),
 
 
     actions: {
