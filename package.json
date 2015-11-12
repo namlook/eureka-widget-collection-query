@@ -1,6 +1,6 @@
 {
   "name": "eureka-widget-collection-query",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "An UI to perform advanced queries on an Eureka collection.",
   "directories": {
     "doc": "doc",
@@ -35,7 +35,6 @@
     "ember-export-application-global": "^1.0.3",
     "ember-disable-prototype-extensions": "^1.0.0",
     "ember-try": "0.0.6"
-
   },
   "keywords": [
     "eureka-widget",
