@@ -17,11 +17,11 @@
     <div class="form-group">
         {{#if isBoolean}}
 
-            {{#x-select value=queryFilter.value classNameBindings=":form-control"}}
+            {{#ek-selectize value=queryFilter.value}}
                 {{#each suggestedBooleans as |bool|}}
-                    {{#x-option value=bool.id}} {{bool.label}} {{/x-option}}
+                    <option value="{{bool.id}}"> {{bool.label}} </option>
                 {{/each}}
-            {{/x-select}}
+            {{/ek-selectize}}
 
         {{else if isText}}
             {{input classNameBindings=":form-control" value=queryFilter.value}}
