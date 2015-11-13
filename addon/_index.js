@@ -18,7 +18,7 @@ export default WidgetCollection.extend(QueryParametrableWidgetMixin, {
 
     /** update the `routeModel.query` from `filterTerm` */
     updateQuery: function() {
-        var filterTerm = this.get('filterTerm');
+        // var filterTerm = this.get('filterTerm');
         var query = this.getWithDefault('routeModel.query.raw');
 
         // TODO
